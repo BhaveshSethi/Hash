@@ -1,6 +1,7 @@
-typedef unsigned long int word32;
+#define MAX_SBOX_COUNT 16
+typedef unsigned long int int32;
 /* The standard S-Box  */
-word32 standardSBoxes[MAX_SBOX_COUNT][256]= {
+int32 standardSBoxes[MAX_SBOX_COUNT][256]= {
 
  {  /* Start of S Box 0  */
 

@@ -19,7 +19,8 @@ void E512(int32 x[16], int passes)
 	int32 SBE;
 	for(idx=0;idx<passes;idx++)
 	{
-		/*cout<<endl<<idx;
+		/*
+		cout<<endl<<idx;
 		for(i=0;i<4;i++)
 			cout<<setw(8)<<hex<<" "<<(int32)x[i];
 		*/

@@ -12,19 +12,19 @@ int32 rotate(int32 x, int shift)
 	return (x>>shift | x<<(32-shift));
 }
 
-void E512(int32 x[16], int passes)
+void E512(int32 res[16], int32 x[16], int passes)
 {
 	int idx,byteInWord,i,next,last;      	//Assumption bytes in a word are 4
 	int32 SBE;
-	for(idx=1;idx<=passes;idx++)
+	for(idx=0;idx<passes;idx++)
 	{
-		for(byteInWord = 1; byteInWord<=4; byteInWord++)
+		for(byteInWord = 0; byteInWord<4; byteInWord++)
 		{
 			for(i=0; i<16; i++)
 			{
 				next = (i+1)%16;
-				last = (i-1)%16;
-				SBE = standardSBoxes[2*idx + ((i/2)%2) -1][(x[i]^0xff)];
+				last = (i+15)%16;
+				SBE = standardSBoxes[2*idx + ((i/2)%2)][(x[i] & 0xffL)];
 				x[next] = x[next]^SBE;
 				x[last] = x[last]^SBE;
 			}
@@ -32,10 +32,18 @@ void E512(int32 x[16], int passes)
 				x[i] = rotate(x[i],rotateSchedule[byteInWord]);
 		}
 	}
-	int32 res[16];
+}
+
+void hash512(int32 res[16], int32 x[16], int passes)
+{
+	int i;
+	memset(res,0,64);
+	int32 block[16];
+	for(i=0;i<16;i++)
+		block[i]=x[i];
+	E512(res,x,passes);
 	for(i=0; i<16; i++)
-		res[i] = x[15-i];
-	x=res;
+		res[i] = block[i] ^ x[15-i];
 }
 void main()
 {
@@ -43,5 +51,11 @@ void main()
 //	cout<<sizeof(unsigned long int);
 //	int32 a = 5;
 //	cout<<rotate(a,32);
+	int32 ip[16],op[16];
+	int i;
+	memset(ip,0,64);
+	hash512(op,ip,8);
+	for(i=0;i<4;i++)
+		cout<<hex<<(unsigned long int)op[i]<<" ";
 	getch();
 }

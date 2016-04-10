@@ -73,11 +73,13 @@ void main()
 	int32 ip[16],op[16],bitLength[2] = {0,0};
 	char str[48],ch;
 	int i,flag=1;
-	FILE *xFile;
-	xFile = fopen("test.txt","rb");
 
 	for(i=0; i<4; i++)
 		op[i] = 0;
+
+	FILE *xFile;
+	xFile = fopen("test.txt","rb");
+
 	while(flag)
 	{
 		ch=fgetc(xFile);
@@ -85,6 +87,7 @@ void main()
 		while(ch!=EOF)
 		{
 			str[i++]=ch;
+			//cout<<ch;
 			if(i==48)
 				break;
 			ch=fgetc(xFile);
@@ -104,13 +107,21 @@ void main()
 		for(i=0;i<4;i++)
 			ip[i] = op[i];
 		for(i=0;i<12;i++)
-			ip[i+4] = (str[4*i] << 24) |
-				  (str[4*i + 1] << 16) |
-				  (str[4*i + 2] << 8) |
-				   str[4*i + 3];
+			ip[i+4] = ((int32)str[4*i] << 24) |
+				  ((int32)str[4*i + 1] << 16) |
+				  ((int32)str[4*i + 2] << 8) |
+				  ((int32)str[4*i + 3]);
+		/*
+		for(i=0;i<16;i++)
+			cout<<hex<<ip[i]<<" ";
+		*/
+
 		hash512(op,ip,8);
-		//for(i=0;i<4;i++)
-		//	cout<<op[i];
+
+		/*
+		for(i=0;i<16;i++)
+			cout<<hex<<op[i]<<" ";
+		*/
 	}
 	fclose(xFile);
 
@@ -136,6 +147,6 @@ void main()
 	cout<<"\n";
 	*/
 	for(i=0;i<4;i++)
-		cout<<hex<<(unsigned long int)ip[i]<<" ";
+		cout<<hex<<(unsigned long int)op[i]<<" ";
 	getch();
 }

@@ -107,10 +107,10 @@ void main()
 		for(i=0;i<4;i++)
 			ip[i] = op[i];
 		for(i=0;i<12;i++)
-			ip[i+4] = ((int32)str[4*i] << 24) |
-				  ((int32)str[4*i + 1] << 16) |
-				  ((int32)str[4*i + 2] << 8) |
-				  ((int32)str[4*i + 3]);
+			ip[i+4] = (((int32)str[4*i] & 0xffL) << 24) |
+				  (((int32)str[4*i + 1] & 0xffL) << 16) |
+				  (((int32)str[4*i + 2] & 0xffL) << 8) |
+				  (((int32)str[4*i + 3] & 0xffL));
 		/*
 		for(i=0;i<16;i++)
 			cout<<hex<<ip[i]<<" ";

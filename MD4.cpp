@@ -10,22 +10,22 @@
 
 typedef unsigned long int int32;
 
-#define R1(a,b,c,d,k,s,X) { \
-	a += F(b,c,d) + X[k]; \
-	a = rotateLeft(a,s);   \
-}
-#define R2(a,b,c,d,k,s,X) { \
-	a += G(b,c,d) + X[k] + 0x5A827999; \
-	a = rotateLeft(a,s); \
-}
-#define R3(a,b,c,d,k,s,X) { \
-	a += H(b,c,d) + X[k] + 0x6ED9EBA1; \
-	a = rotateLeft(a,s); \
-}
-
 int32 rotateLeft(int32 x, int shift)
 {
 	return (x<<shift | x>>(32-shift));
+}
+
+void R1(int32 &a,int32 b,int32 c,int32 d,int k,int s,int32 X[]) {
+	a += F(b,c,d) + X[k];
+	a = rotateLeft(a,s);
+}
+void R2(int32 &a,int32 b,int32 c,int32 d,int k,int s,int32 X[]) {
+	a += G(b,c,d) + X[k] + 0x5A827999;
+	a = rotateLeft(a,s);
+}
+void R3(int32 &a,int32 b,int32 c,int32 d,int k,int s,int32 X[]) {
+	a += H(b,c,d) + X[k] + 0x6ED9EBA1;
+	a = rotateLeft(a,s);
 }
 
 void main()
@@ -35,15 +35,18 @@ void main()
 	int bitLength,byteLength,i=0,N=0,j;
 	int32 ip[50];
 	int32 X[16],AA,BB,CC,DD;
-	int32 A = 0x01234567L,
-	      B = 0x89abcdefL,
-	      C = 0xfedcba98L,
-	      D = 0x76543210L;
+	int32 A = 0x67452301L,
+	      B = 0xefcdab89L,
+	      C = 0x98badcfeL,
+	      D = 0x10325476L;
 
+	cout<<"\n\tHashing Technique used MD4";
+	cout<<"\n\tEnter String to Hash ";
 	memset(ip,0,200);
-	//gets(str);
-	strcpy(str,"");
-	cout<<str<<" "<<(byteLength = strlen(str))<<endl;
+	gets(str);
+	//strcpy(str,"a");
+	//cout<<str<<" "<<(
+	byteLength = strlen(str);
 	bitLength = 8*byteLength;
 
 	while(byteLength%64 != 56)
@@ -54,7 +57,7 @@ void main()
 			str[byteLength++] = (unsigned char)(0);
 	}
 
-	cout<<byteLength<<endl;
+	//cout<<byteLength<<endl;
 
 	for(i=0;i<byteLength;i+=4)
 		ip[i/4] = (((int32)str[i] & 0xffL) << 24) |
@@ -66,11 +69,20 @@ void main()
 	ip[N++] = 0;
 	ip[N++] = (int32)(bitLength);
 
+	//for(i=0;i<N;i++)
+	//cout<<hex<<ip[i]<<" ";
 
+	/*AA=A;
+	R1(A,B,C,D,0,0,X);
+	cout<<endl<<A;
+	AA += F(B,C,D) + X[1];
+	cout<<endl<<AA<<" "<<F(B,C,D);
+	*/
 	for(i=0;i<N/16;i++)
 	{
 		for(j=0;j<16;j++)
 			X[j] = ip[i*16 + j];
+
 		AA = A;
 		BB = B;
 		CC = C;
@@ -134,7 +146,7 @@ void main()
 
 	}
 
-	cout<<endl<<hex<<A<<" "<<B<<" "<<C<<" "<<D;
+	cout<<endl<<"Hash generated: "<<hex<<A<<" "<<B<<" "<<C<<" "<<D;
 
 	/*
 	for(i=0;i<N;i++)

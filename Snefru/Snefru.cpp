@@ -70,6 +70,8 @@ void main()
 //	cout<<sizeof(unsigned long int);
 //	int32 a = 5;
 //	cout<<rotate(a,32);
+	cout<<"\n\tHashing Technique used MD4";
+	cout<<"\n\tUsing File to Hash test.txt";
 	int32 ip[16],op[16],bitLength[2] = {0,0};
 	char str[48],ch;
 	int i,flag=1;
@@ -146,6 +148,7 @@ void main()
 	hash512(ip,op,8);
 	cout<<"\n";
 	*/
+	cout<<"\n\nHash generated: ";
 	for(i=0;i<4;i++)
 		cout<<hex<<(unsigned long int)op[i]<<" ";
 	getch();

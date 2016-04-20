@@ -2,7 +2,15 @@
 #include<iostream.h>
 #include<conio.h>
 #include<stdio.h>
+#include<iomanip.h>
 #include<string.h>
+
+#define printHash(A,B,C,D) { \
+print(A); \
+print(B); \
+print(C); \
+print(D); \
+}
 
 typedef unsigned long int int32;
 
@@ -70,9 +78,12 @@ void R4(int32 &a,int32 b,int32 c,int32 d,int k,int s,int32 X[],int i) {
 	a += I(b,c,d) + X[k] + T[i];
 	a = b + rotateLeft(a,s);
 }
-void print(int32 A, int32 B, int32 C, int32 D)
+void print(int32 A)
 {
-	cout<<endl<<hex<<A<<" "<<B<<" "<<C<<" "<<D;
+	cout<<hex<<setw(2)<<setfill('0')<<((A)&0xff);
+	cout<<setw(2)<<((A>>8)&0xff);
+	cout<<setw(2)<<((A>>16)&0xff);
+	cout<<setw(2)<<((A>>24)&0xff)<<" ";
 }
 
 void main()
@@ -86,17 +97,15 @@ void main()
 	      B = 0xefcdab89L,
 	      C = 0x98badcfeL,
 	      D = 0x10325476L;
-//	cout<<hex<<(~A);
+
 	cout<<"\n\tHashing Technique used MD5";
 	cout<<"\n\tEnter String to Hash ";
 	memset(ip,0,200);
 	//gets(str);
-	strcpy(str,"a");
+	strcpy(str,"abc");
 	byteLength = strlen(str);
 	cout<<str<<" "<<byteLength<<endl;
 	bitLength = 8*byteLength;
-
-	//cout<<hex<<T[0]+X[0]+A+F(B,C,D);
 
 	while(byteLength%64 != 56)
 	{
@@ -114,26 +123,16 @@ void main()
 			  (((int32)str[i + 2] & 0xffL) << 16) |
 			  (((int32)str[i + 3] & 0xffL) << 24);
 
-	//ip[0] = 0x00008061L; //comment this
-
 	N = i/4;
-	cout<<endl;
-	for(i=0;i<N;i++)
-	cout<<hex<<ip[i]<<" ";
-	cout<<N;
-	ip[N++] = 0x00000008L;
+	ip[N++] = (int32)bitLength;
 	ip[N++] = 0;
 
+
 	for(i=0;i<N;i++)
-	cout<<hex<<ip[i]<<" ";
+		cout<<hex<<ip[i]<<" ";
 	cout<<dec<<N;
 
-	/*AA=A;
-	R1(A,B,C,D,0,0,X);
-	cout<<endl<<A;
-	AA += F(B,C,D) + X[1];
-	cout<<endl<<AA<<" "<<F(B,C,D);
-	*/
+
 	for(i=0;i<N/16;i++)
 	{
 		for(j=0;j<16;j++)
@@ -145,42 +144,8 @@ void main()
 		CC = C;
 		DD = D;
 
-		/*
-		for(j=0;j<64;j++)
-		{
-			if(j>=0 && j<16)
-			{
-				temp = F(B,C,D);
-				g = j;
-			}
-			else if(j>=16 && j<32)
-			{
-				temp = G(B,C,D);
-				g = (5*j + 1)%16;
-			}
-			else if(j>=32 && j<48)
-			{
-				temp = H(B,C,D);
-				g = (3*j + 5)%16;
-			}
-			else if(j>=48 && j<64)
-			{
-				temp = I(B,C,D);
-				g = (7*j)%16;
-			}
-
-			dtemp = D;
-			D = C;
-			C = B;
-			B = B + rotateLeft((A + temp + X[g] + T[j]),shift[j]);
-			A = dtemp;
-		}
-		*/
-
-
-
-		R1(A,B,C,D, 0, 7,X, 0);	//print(A,B,C,D);
-		R1(D,A,B,C, 1,12,X, 1); //print(A,B,C,D);
+		R1(A,B,C,D, 0, 7,X, 0);
+		R1(D,A,B,C, 1,12,X, 1);
 		R1(C,D,A,B, 2,17,X, 2);
 		R1(B,C,D,A, 3,22,X, 3);
 		R1(A,B,C,D, 4, 7,X, 4);
@@ -254,22 +219,7 @@ void main()
 
 	}
 
-	//print(A,B,C,D);
-
-
-	cout<<hex<<((A)&0xff)<<((A>>8)&0xff)<<((A>>16)&0xff)<<((A>>24)&0xff)<<" ";
-	cout<<((B)&0xff)<<((B>>8)&0xff)<<((B>>16)&0xff)<<((B>>24)&0xff)<<" ";
-	cout<<((C)&0xff)<<((C>>8)&0xff)<<((C>>16)&0xff)<<((C>>24)&0xff)<<" ";
-	cout<<((D)&0xff)<<((D>>8)&0xff)<<((D>>16)&0xff)<<((D>>24)&0xff)<<" ";
-
-	/*
-	for(i=0;i<N;i++)
-		cout<<hex<<ip[i]<<" ";
-	*/
-	/*
-	int32 X=0x00101001L,Y=0x01101010L,Z=0x01011010L;
-	cout<<hex<<H(X,Y,Z)<<endl;
-	cout<<hex<<(X&Y)<<" "<<(Y&Z)<<" "<<(Z&X);
-	*/
+	cout<<"\n\tHash generated: ";
+	printHash(A,B,C,D);
 	getch();
 }

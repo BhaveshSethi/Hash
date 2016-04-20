@@ -1,5 +1,5 @@
 //MD4 Hash
-#include<iostream.h>
+#include<fstream.h>
 #include<conio.h>
 #include<stdio.h>
 #include<iomanip.h>
@@ -93,18 +93,20 @@ void main()
 	int bitLength,byteLength,i=0,N=0,j,g;
 	int32 ip[50];
 	int32 X[16],AA,BB,CC,DD,temp,dtemp;
+
+	cout<<"\n\tHashing Technique used MD5";
+	cout<<"\n\tHashing File ";
+
 	int32 A = 0x67452301L,
 	      B = 0xefcdab89L,
 	      C = 0x98badcfeL,
 	      D = 0x10325476L;
 
-	cout<<"\n\tHashing Technique used MD5";
-	cout<<"\n\tEnter String to Hash ";
 	memset(ip,0,200);
 	//gets(str);
-	strcpy(str,"abc");
+	strcpy(str,"test");
 	byteLength = strlen(str);
-	cout<<str<<" "<<byteLength<<endl;
+	//cout<<str<<" "<<byteLength<<endl;
 	bitLength = 8*byteLength;
 
 	while(byteLength%64 != 56)
@@ -114,9 +116,7 @@ void main()
 		else
 			str[byteLength++] = (unsigned char)(0);
 	}
-
-	cout<<byteLength<<endl;
-
+		//cout<<byteLength<<endl;
 	for(i=0;i<byteLength;i+=4)
 		ip[i/4] = (((int32)str[i] & 0xffL)) |
 			  (((int32)str[i + 1] & 0xffL) << 8) |
@@ -127,23 +127,20 @@ void main()
 	ip[N++] = (int32)bitLength;
 	ip[N++] = 0;
 
-
+	/*
 	for(i=0;i<N;i++)
 		cout<<hex<<ip[i]<<" ";
 	cout<<dec<<N;
-
-
+	*/
 	for(i=0;i<N/16;i++)
 	{
 		for(j=0;j<16;j++)
 			X[j] = ip[i*16 + j];
 		cout<<endl;
-
 		AA = A;
 		BB = B;
 		CC = C;
 		DD = D;
-
 		R1(A,B,C,D, 0, 7,X, 0);
 		R1(D,A,B,C, 1,12,X, 1);
 		R1(C,D,A,B, 2,17,X, 2);
@@ -216,10 +213,12 @@ void main()
 		B = B + BB;
 		C = C + CC;
 		D = D + DD;
-
 	}
-
+	printHash(A,B,C,D);
+	/*
 	cout<<"\n\tHash generated: ";
 	printHash(A,B,C,D);
+	*/
+
 	getch();
 }

@@ -4,12 +4,24 @@
 #include<stdio.h>
 #include<string.h>
 
-#define F(X,Y,Z) ((X&Y) | ((0xffffffffL ^ X)&Z) )
-#define G(X,Y,Z) ((X&Z) | ((0xffffffffL ^ Z)&Y) )
-#define H(X,Y,Z) (X ^ Y ^ Z)
-#define I(X,Y,Z) (Y ^ ((0xffffffffL ^ Z) | X))
-
 typedef unsigned long int int32;
+
+int32 F(int32 X,int32 Y,int32 Z)
+{
+	return (((X)&(Y)) | ((~X)&(Z)) );
+}
+int32 G(int32 X,int32 Y,int32 Z)
+{
+	return (((X)&(Z)) | ((~Z)&(Y)) );
+}
+int32 H(int32 X,int32 Y,int32 Z)
+{
+	return ((X) ^ (Y) ^ (Z));
+}
+int32 I(int32 X,int32 Y,int32 Z)
+{
+	return ((Y) ^ ((~Z) | (X)));
+}
 
 int32 T[64] = {	0xd76aa478L,0xe8c7b756L,0x242070dbL,0xc1bdceeeL,
 		0xf57c0fafL,0x4787c62aL,0xa8304613L,0xfd469501L,
@@ -31,6 +43,10 @@ int32 T[64] = {	0xd76aa478L,0xe8c7b756L,0x242070dbL,0xc1bdceeeL,
 		0x6fa87e4fL,0xfe2ce6e0L,0xa3014314L,0x4e0811a1L,
 		0xf7537e82L,0xbd3af235L,0x2ad7d2bbL,0xeb86d391L};
 
+int shift[64] = {7,12,17,22,7,12,17,22,7,12,17,22,7,12,17,22,
+	     5, 9,14,20,5, 9,14,20,5, 9,14,20,5, 9,14,20,
+	     4,11,16,23,4,11,16,23,4,11,16,23,4,11,16,23,
+	     6,10,15,21,6,10,15,21,6,10,15,21,6,10,15,21};
 
 int32 rotateLeft(int32 x, int shift)
 {
@@ -54,19 +70,23 @@ void R4(int32 &a,int32 b,int32 c,int32 d,int k,int s,int32 X[],int i) {
 	a += I(b,c,d) + X[k] + T[i];
 	a = b + rotateLeft(a,s);
 }
+void print(int32 A, int32 B, int32 C, int32 D)
+{
+	cout<<endl<<hex<<A<<" "<<B<<" "<<C<<" "<<D;
+}
 
 void main()
 {
 	clrscr();
 	char str[100];
-	int bitLength,byteLength,i=0,N=0,j;
+	int bitLength,byteLength,i=0,N=0,j,g;
 	int32 ip[50];
-	int32 X[16],AA,BB,CC,DD;
+	int32 X[16],AA,BB,CC,DD,temp,dtemp;
 	int32 A = 0x67452301L,
 	      B = 0xefcdab89L,
 	      C = 0x98badcfeL,
 	      D = 0x10325476L;
-
+//	cout<<hex<<(~A);
 	cout<<"\n\tHashing Technique used MD5";
 	cout<<"\n\tEnter String to Hash ";
 	memset(ip,0,200);
@@ -76,6 +96,8 @@ void main()
 	cout<<str<<" "<<byteLength<<endl;
 	bitLength = 8*byteLength;
 
+	//cout<<hex<<T[0]+X[0]+A+F(B,C,D);
+
 	while(byteLength%64 != 56)
 	{
 		if(!(i++))
@@ -84,20 +106,27 @@ void main()
 			str[byteLength++] = (unsigned char)(0);
 	}
 
-	//cout<<byteLength<<endl;
+	cout<<byteLength<<endl;
 
 	for(i=0;i<byteLength;i+=4)
-		ip[i/4] = (((int32)str[i] & 0xffL) << 24) |
-			  (((int32)str[i + 1] & 0xffL) << 16) |
-			  (((int32)str[i + 2] & 0xffL) << 8) |
-			  (((int32)str[i + 3] & 0xffL));
+		ip[i/4] = (((int32)str[i] & 0xffL)) |
+			  (((int32)str[i + 1] & 0xffL) << 8) |
+			  (((int32)str[i + 2] & 0xffL) << 16) |
+			  (((int32)str[i + 3] & 0xffL) << 24);
+
+	//ip[0] = 0x00008061L; //comment this
 
 	N = i/4;
+	cout<<endl;
+	for(i=0;i<N;i++)
+	cout<<hex<<ip[i]<<" ";
+	cout<<N;
+	ip[N++] = 0x00000008L;
 	ip[N++] = 0;
-	ip[N++] = (int32)(bitLength);
 
 	for(i=0;i<N;i++)
 	cout<<hex<<ip[i]<<" ";
+	cout<<dec<<N;
 
 	/*AA=A;
 	R1(A,B,C,D,0,0,X);
@@ -109,14 +138,49 @@ void main()
 	{
 		for(j=0;j<16;j++)
 			X[j] = ip[i*16 + j];
+		cout<<endl;
 
 		AA = A;
 		BB = B;
 		CC = C;
 		DD = D;
 
-		R1(A,B,C,D, 0, 7,X, 0);
-		R1(D,A,B,C, 1,12,X, 1);
+		/*
+		for(j=0;j<64;j++)
+		{
+			if(j>=0 && j<16)
+			{
+				temp = F(B,C,D);
+				g = j;
+			}
+			else if(j>=16 && j<32)
+			{
+				temp = G(B,C,D);
+				g = (5*j + 1)%16;
+			}
+			else if(j>=32 && j<48)
+			{
+				temp = H(B,C,D);
+				g = (3*j + 5)%16;
+			}
+			else if(j>=48 && j<64)
+			{
+				temp = I(B,C,D);
+				g = (7*j)%16;
+			}
+
+			dtemp = D;
+			D = C;
+			C = B;
+			B = B + rotateLeft((A + temp + X[g] + T[j]),shift[j]);
+			A = dtemp;
+		}
+		*/
+
+
+
+		R1(A,B,C,D, 0, 7,X, 0);	//print(A,B,C,D);
+		R1(D,A,B,C, 1,12,X, 1); //print(A,B,C,D);
 		R1(C,D,A,B, 2,17,X, 2);
 		R1(B,C,D,A, 3,22,X, 3);
 		R1(A,B,C,D, 4, 7,X, 4);
@@ -190,7 +254,13 @@ void main()
 
 	}
 
-	cout<<endl<<"Hash generated: "<<hex<<A<<" "<<B<<" "<<C<<" "<<D;
+	//print(A,B,C,D);
+
+
+	cout<<hex<<((A)&0xff)<<((A>>8)&0xff)<<((A>>16)&0xff)<<((A>>24)&0xff)<<" ";
+	cout<<((B)&0xff)<<((B>>8)&0xff)<<((B>>16)&0xff)<<((B>>24)&0xff)<<" ";
+	cout<<((C)&0xff)<<((C>>8)&0xff)<<((C>>16)&0xff)<<((C>>24)&0xff)<<" ";
+	cout<<((D)&0xff)<<((D>>8)&0xff)<<((D>>16)&0xff)<<((D>>24)&0xff)<<" ";
 
 	/*
 	for(i=0;i<N;i++)

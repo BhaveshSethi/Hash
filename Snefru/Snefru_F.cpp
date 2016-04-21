@@ -1,6 +1,6 @@
 //Snefru Hash
 #include<snefru.h>
-#include<iostream.h>
+#include<fstream.h>
 #include<conio.h>
 #include<iomanip.h>
 #include<stdio.h>
@@ -21,11 +21,6 @@ void E512(int32 x[16], int passes)
 	int32 SBE;
 	for(idx=0;idx<passes;idx++)
 	{
-		/*
-		cout<<endl<<idx;
-		for(i=0;i<4;i++)
-			cout<<setw(8)<<hex<<" "<<(int32)x[i];
-		*/
 		for(byteInWord = 0; byteInWord<4; byteInWord++)
 		{
 			for(i=0; i<16; i++)
@@ -78,76 +73,68 @@ void convert(char* str, int32 i, int32 ip[16])
 void print(int32 P[], int i)
 {
 	for(int j=0;j<i;j++)
-		cout<<hex<<P[j]<<" ";
+		cout<<hex<<setw(8)<<setfill('0')<<P[j]<<" ";
 }
 
 void main()
 {
 	clrscr();
 	cout<<"\n\tHashing Technique used Snefru";
+	cout<<"\n\tHash File Test.txt ";
 	int32 ip[16],op[16],bitLength[2] = {0,0}, counter=0;
 	char str[48],ch;
-	int i,flag=1;
+	int i;
 
-	for(i=0; i<4; i++)
-		op[i] = 0;
+	fstream fin("test.txt",ios::in|ios::binary);
+	FILE *hash = fopen("hash.txt","wt");
 
-	//gets(str);
-	strcpy(str,"Hashing");
-	//str[0]=1;
-	increment(bitLength,8*strlen(str));
-
-	for(i=0;i<4;i++)
-		ip[i] = op[i];
-
-	for(counter=0; (counter+48) <= (bitLength[1]/8); counter+=48)
+	while(!fin.eof())
 	{
-		convert(str,counter,ip);
-		//print(ip,16);
-		hash512(op,ip,8);
+
+		for(i=0; i<4; i++)
+			op[i] = 0;
+		fin>>str;
+		bitLength[1] = bitLength[0] = 0;
+		increment(bitLength,8*strlen(str));
 
 		for(i=0;i<4;i++)
 			ip[i] = op[i];
-	}
 
-	if(counter*8 < bitLength[1])
-	{
-		counter += (bitLength[1]/8);
-		while(counter%48!=0)
-			str[counter++] = 0;
-		convert(str,(counter-48),ip);
+		for(counter=0; (counter+48) <= (bitLength[1]/8); counter+=48)
+		{
+			convert(str,counter,ip);
+			//print(ip,16);
+			hash512(op,ip,8);
+
+			for(i=0;i<4;i++)
+				ip[i] = op[i];
+		}
+
+		if(counter*8 < bitLength[1])
+		{
+			counter += (bitLength[1]/8);
+			while(counter%48!=0)
+				str[counter++] = 0;
+			convert(str,(counter-48),ip);
+			//print(ip,16);
+			hash512(op,ip,8);
+
+			for(i=0;i<4;i++)
+				ip[i] = op[i];
+		}
+		//print(ip,16);
+		ip[14] = bitLength[0];
+		ip[15] = bitLength[1];
 		//print(ip,16);
 		hash512(op,ip,8);
 
-		for(i=0;i<4;i++)
-			ip[i] = op[i];
+		cout<<endl<<setw(10)<<setfill(' ')<<str<<" ";
+		print(op,4);
+
+		fprintf(hash,"%10s ",str);
+		for(int j=0;j<4;j++)
+			fprintf(hash,"%08lx ",op[j]);
+		fprintf(hash,"\n");
 	}
-	//print(ip,16);
-	ip[14] = bitLength[0];
-	ip[15] = bitLength[1];
-	//print(ip,16);
-	hash512(op,ip,8);
-
-	cout<<"\n\nHash generated for '"<<str<<"': ";
-	print(op,4);
-	/*
-	for(i=0;i<16;i++)
-		cout<<hex<<op[i]<<" ";
-	*/
-
-
-	/*
-	memset(ip,0,64);
-	do
-	{
-		size = scanf;
-		cout<<endl<<str<<endl;
-	}while(size>0);
-	hash512(op,ip,8);
-	for(i=0;i<4;i++)
-		cout<<hex<<(unsigned long int)op[i]<<" ";
-	hash512(ip,op,8);
-	cout<<"\n";
-	*/
 	getch();
 }

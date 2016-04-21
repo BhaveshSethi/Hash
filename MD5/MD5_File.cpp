@@ -114,7 +114,7 @@ void main()
 	fstream fin("test.txt",ios::in|ios::binary);
 
 	cout<<"\n\tHashing Technique used MD5";
-	cout<<"\n\tHashing File ";
+	cout<<"\n\tHashing File Test.txt\n";
 
 
 	while(!fin.eof())
@@ -130,7 +130,7 @@ void main()
 		//gets(str);
 		//strcpy(str,"abc");
 		byteLength = strlen(str);
-		cout<<str<<" "<<byteLength<<endl;
+		cout<<endl<<setw(10)<<setfill(' ')<<str<<" ";
 		bitLength = 8*byteLength;
 
 		while(byteLength%64 != 56)
@@ -163,7 +163,6 @@ void main()
 		{
 			for(j=0;j<16;j++)
 				X[j] = ip[i*16 + j];
-			cout<<endl;
 
 			AA = A;
 			BB = B;

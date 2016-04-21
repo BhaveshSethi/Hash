@@ -1,4 +1,4 @@
-//MD4 Hash
+//MD5 Hash
 #include<fstream.h>
 #include<conio.h>
 #include<stdio.h>
@@ -104,7 +104,7 @@ void main()
 
 	memset(ip,0,200);
 	//gets(str);
-	strcpy(str,"test");
+	strcpy(str,"is");
 	byteLength = strlen(str);
 	//cout<<str<<" "<<byteLength<<endl;
 	bitLength = 8*byteLength;

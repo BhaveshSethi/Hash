@@ -1,4 +1,4 @@
-//MD4 Hash
+//MD5 Hash
 #include<fstream.h>
 #include<conio.h>
 #include<stdio.h>

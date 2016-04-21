@@ -4,6 +4,7 @@
 #include<conio.h>
 #include<iomanip.h>
 #include<stdio.h>
+#include<string.h>
 
 #define blockSize 512
 
@@ -48,9 +49,9 @@ void hash512(int32 res[16], int32 x[16], int passes)
 	for(i=0;i<16;i++)
 		block[i]=x[i];
 	memset(res,0,64);
-	E512(x,passes);
+	E512(block,passes);
 	for(i=0; i<4; i++)
-		res[i] = block[i] ^ x[15-i];
+		res[i] = x[i] ^ block[15-i];
 }
 
 void increment(int32 bitLength[2], int increment)
@@ -64,76 +65,77 @@ void increment(int32 bitLength[2], int increment)
 		bitLength[1]+=increment;
 }
 
+void convert(char* str, int32 i, int32 ip[16])
+{
+	for(int32 j=0;j<48;j+=4)
+	{
+		ip[4 + j/4] = (((int32)str[i + j] & 0xffL) << 24) |
+			      (((int32)str[i + j + 1] & 0xffL) << 16) |
+			      (((int32)str[i + j + 2] & 0xffL) << 8) |
+			      (((int32)str[i + j + 3] & 0xffL));
+	}
+}
+void print(int32 P[], int i)
+{
+	for(int j=0;j<i;j++)
+		cout<<hex<<P[j]<<" ";
+}
+
 void main()
 {
 	clrscr();
-//	cout<<sizeof(unsigned long int);
-//	int32 a = 5;
-//	cout<<rotate(a,32);
-	cout<<"\n\tHashing Technique used MD4";
-	cout<<"\n\tUsing File to Hash test.txt";
-	int32 ip[16],op[16],bitLength[2] = {0,0};
+	cout<<"\n\tHashing Technique used Snefru";
+	cout<<"\n\tEnter String ";
+	int32 ip[16],op[16],bitLength[2] = {0,0}, counter=0;
 	char str[48],ch;
 	int i,flag=1;
 
 	for(i=0; i<4; i++)
 		op[i] = 0;
 
-	FILE *xFile;
-	xFile = fopen("test.txt","rb");
+	//gets(str);
+	strcpy(str,"hello");
+	//str[0]=1;
+	increment(bitLength,8*strlen(str));
 
-	while(flag)
+	for(i=0;i<4;i++)
+		ip[i] = op[i];
+
+	for(counter=0; (counter+48) <= (bitLength[1]/8); counter+=48)
 	{
-		ch=fgetc(xFile);
-		i = 0;
-		while(ch!=EOF)
-		{
-			str[i++]=ch;
-			//cout<<ch;
-			if(i==48)
-				break;
-			ch=fgetc(xFile);
-		}
-
-		increment(bitLength,8*i);
-
-		if(i==0)
-			break;
-		else if(i<48)
-		{
-			flag=0;
-			for(;i<48;i++)
-				str[i]=0;
-		}
+		convert(str,counter,ip);
+		//print(ip,16);
+		hash512(op,ip,8);
 
 		for(i=0;i<4;i++)
 			ip[i] = op[i];
-		for(i=0;i<12;i++)
-			ip[i+4] = (((int32)str[4*i] & 0xffL) << 24) |
-				  (((int32)str[4*i + 1] & 0xffL) << 16) |
-				  (((int32)str[4*i + 2] & 0xffL) << 8) |
-				  (((int32)str[4*i + 3] & 0xffL));
-		/*
-		for(i=0;i<16;i++)
-			cout<<hex<<ip[i]<<" ";
-		*/
+	}
 
+	if(counter*8 < bitLength[1])
+	{
+		counter += (bitLength[1]/8);
+		while(counter%48!=0)
+			str[counter++] = 0;
+		convert(str,(counter-48),ip);
+		//print(ip,16);
 		hash512(op,ip,8);
 
-		/*
-		for(i=0;i<16;i++)
-			cout<<hex<<op[i]<<" ";
-		*/
+		for(i=0;i<4;i++)
+			ip[i] = op[i];
 	}
-	fclose(xFile);
-
-	for(i=0;i<16;i++)
-		ip[i] = op[i];
-
+	print(ip,16);
 	ip[14] = bitLength[0];
 	ip[15] = bitLength[1];
-
+	print(ip,16);
 	hash512(op,ip,8);
+
+	cout<<"\n\nHash generated: ";
+	print(op,4);
+	/*
+	for(i=0;i<16;i++)
+		cout<<hex<<op[i]<<" ";
+	*/
+
 
 	/*
 	memset(ip,0,64);
@@ -148,8 +150,5 @@ void main()
 	hash512(ip,op,8);
 	cout<<"\n";
 	*/
-	cout<<"\n\nHash generated: ";
-	for(i=0;i<4;i++)
-		cout<<hex<<(unsigned long int)op[i]<<" ";
 	getch();
 }

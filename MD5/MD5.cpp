@@ -104,7 +104,7 @@ void main()
 
 	memset(ip,0,200);
 	//gets(str);
-	strcpy(str,"is");
+	strcpy(str,"abc");
 	byteLength = strlen(str);
 	//cout<<str<<" "<<byteLength<<endl;
 	bitLength = 8*byteLength;
@@ -127,11 +127,11 @@ void main()
 	ip[N++] = (int32)bitLength;
 	ip[N++] = 0;
 
-	/*
+
 	for(i=0;i<N;i++)
 		cout<<hex<<ip[i]<<" ";
-	cout<<dec<<N;
-	*/
+	//cout<<dec<<N;
+
 	for(i=0;i<N/16;i++)
 	{
 		for(j=0;j<16;j++)

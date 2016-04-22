@@ -24,7 +24,8 @@ int32 K[2][5] =
 {{ 0x00000000,0x5a827999,0x6ed9eba1,0x8f1bbcdc,0xa953fd4e },
  { 0x50a28be6,0x5c4dd124,0x6d703ef3,0x7a6d76e9,0x00000000 }};
 
-int r[2][80] = {{ 7, 4, 13, 1, 10, 6, 15, 3, 12, 0, 9, 5, 2, 14, 11, 8,
+int r[2][80] = {{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+		  7, 4, 13, 1, 10, 6, 15, 3, 12, 0, 9, 5, 2, 14, 11, 8,
 		  3, 10, 14, 4, 9, 15, 8, 1, 2, 7, 0, 6, 13, 11, 5, 12,
 		  1, 9, 11, 10, 0, 8, 12, 4, 13, 3, 7, 15, 14, 5, 6, 2,
 		  4, 0, 5, 9, 7, 12, 2, 10, 14, 1, 3, 8, 11, 6, 15, 13 },
@@ -50,6 +51,16 @@ void print(int32 P[], int i)
 	cout<<endl;
 	for(int j=0;j<i;j++)
 		cout<<hex<<setw(8)<<setfill('0')<<P[j]<<" ";
+}
+
+void printLE(int32 P[], int i)
+{
+	cout<<endl;
+	for(int j=0;j<i;j++)
+		cout<<hex<<setfill('0')<<setw(2)<<(P[j]&0xff)
+					  <<setw(2)<<((P[j]>> 8)&0xff)
+					  <<setw(2)<<((P[j]>>16)&0xff)
+					  <<setw(2)<<((P[j]>>24)&0xff)<<" ";
 }
 
 void increment(int32 bitLength[2], int increment)
@@ -80,7 +91,7 @@ void main()
 
 	memset(str,0,64);
 	memset(X,0,64);
-	strcpy(str,"abc");
+	strcpy(str,"message digest");
 	bitLength[0] = bitLength[1] = 0;
 	increment(bitLength,8*(byteLength = strlen(str)));
 
@@ -88,14 +99,14 @@ void main()
 	str[byteLength] = (unsigned char)0x80;
 
 	for(i=0;i<56;i+=4)
-		X[i/4] = (((int32)str[i] & 0xffL) << 24) |
-			  (((int32)str[i + 1] & 0xffL) << 16) |
-			  (((int32)str[i + 2] & 0xffL) << 8) |
-			  (((int32)str[i + 3] & 0xffL));
+		X[i/4] = (((int32)str[i] & 0xffL)) |
+			 (((int32)str[i + 1] & 0xffL) << 8) |
+			 (((int32)str[i + 2] & 0xffL) << 16) |
+			 (((int32)str[i + 3] & 0xffL) << 24);
 
-	X[14] = bitLength[0];
-	X[15] = bitLength[1];
-	print(X,16);
+	X[15] = bitLength[0];
+	X[14] = bitLength[1];
+	//print(X,16);
 
 	int32 h[5] =
 	{ 0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0 };
@@ -105,16 +116,16 @@ void main()
 
 	for(j=0;j<80;j++)
 	{
-		T = A[0][0] ^ f(j,A[0][1],A[0][2],A[0][3]) ^ X[r[0][j]] ^ K[0][j];
-		T = ROTL(T,s[0][j]) ^ A[0][4];
+		T = A[0][0] + f(j,A[0][1],A[0][2],A[0][3]) + X[r[0][j]] + K[0][j/16];
+		T = ROTL(T,s[0][j]) + A[0][4];
 		A[0][0] = A[0][4];
 		A[0][4] = A[0][3];
 		A[0][3] = ROTL(A[0][2],10);
 		A[0][2] = A[0][1];
 		A[0][1] = T;
 
-		T = A[1][0] ^ f(79-j,A[1][1],A[1][2],A[1][3]) ^ X[r[1][j]] ^ K[1][j];
-		T = ROTL(T,s[1][j]) ^ A[1][4];
+		T = A[1][0] + f(79-j,A[1][1],A[1][2],A[1][3]) + X[r[1][j]] + K[1][j/16];
+		T = ROTL(T,s[1][j]) + A[1][4];
 		A[1][0] = A[1][4];
 		A[1][4] = A[1][3];
 		A[1][3] = ROTL(A[1][2],10);
@@ -122,15 +133,15 @@ void main()
 		A[1][1] = T;
 	}
 
-	T = h[1] ^ A[0][2] ^ A[1][3];
-	h[1] = h[2] ^ A[0][3] ^ A[1][4];
-	h[2] = h[3] ^ A[0][4] ^ A[1][0];
-	h[3] = h[4] ^ A[0][0] ^ A[1][1];
-	h[4] = h[0] ^ A[0][1] ^ A[1][2];
+	T = h[1] + A[0][2] + A[1][3];
+	h[1] = h[2] + A[0][3] + A[1][4];
+	h[2] = h[3] + A[0][4] + A[1][0];
+	h[3] = h[4] + A[0][0] + A[1][1];
+	h[4] = h[0] + A[0][1] + A[1][2];
 	h[0] = T;
 
 	cout<<"\n\tHash generated: ";
-	print(h,5);
+	printLE(h,5);
 
 	getch();
 }

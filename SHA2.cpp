@@ -7,7 +7,7 @@
 
 typedef unsigned long int int32;
 
-int32 H[8] = { 0x6a09e667,
+int32 h[8] = { 0x6a09e667,
 	       0xbb67ae85,
 	       0x3c6ef372,
 	       0xa54ff53a,
@@ -65,9 +65,25 @@ int32 SHR(int32 x, int shift)
 	return x>>shift;
 }
 
+int32 Ch(int32 x, int32 y, int32 z)
+{
+	return ((x&y)^(~(x)&z));
+}
+
+int32 Maj(int32 x, int32 y, int32 z)
+{
+	return ((x&y) ^ (y&z) ^ (z&x));
+}
+
 void init(int32 w[64])
 {
-
+	int32 s0,s1;
+	for(int i=16;i<64;i++)
+	{
+		s0 = ROTR(w[i-15],7) ^ ROTR(w[i-15],18) ^ SHR(w[i-15],3);
+		s1 = ROTR(w[i-2],17) ^ ROTR(w[i-2],19) ^ SHR(w[i-2],10);
+		w[i] = w[i-16] + s0 + w[i-7] + s1;
+	}
 }
 
 
@@ -77,15 +93,16 @@ void main()
 	char str[64];
 	int i,j,byteLength;
 	int32 bitLength[2] = {0,0},w[64];
+	int32 a[8],T1,T0,S0,S1;
 
 	cout<<"\n\tHashing Technique used SHA-2";
 
 	memset(str,0,64);
-	strcpy(str,"abc");
+	strcpy(str,"Hash");
 	increment(bitLength,8*(byteLength = strlen(str)));
 	memset(w,0,256);
 
-	cout<<"\n\t"<<str<<" "<<byteLength;
+	cout<<"\n\tInput String: "<<str<<" of length "<<byteLength;
 	str[byteLength] = (unsigned char)0x80;
 
 	for(i=0;i<56;i+=4)
@@ -99,6 +116,34 @@ void main()
 
 	init(w);
 
-	print(w,16);
+	//print(w,16);
+
+	for(i=0;i<8;i++)
+		a[i] = h[i];
+
+	for(i=0;i<64;i++)
+	{
+		S1 = ROTR(a[4],6) ^ ROTR(a[4],11) ^ ROTR(a[4],25);
+		T1 = S1 + a[7] + Ch(a[4],a[5],a[6]) + k[i] + w[i];
+
+		S0 = ROTR(a[0],2) ^ ROTR(a[0],13) ^ ROTR(a[0],22);
+		T0 = S0 + Maj(a[0],a[1],a[2]);
+
+		S0 = a[7];
+		for(j=7;j>0;j--)
+		{
+			a[j] = a[j-1];
+		}
+
+		a[4] += T1;
+		a[0] = T1 + T0;
+	}
+
+	for(i=0;i<8;i++)
+		h[i] += a[i];
+
+	cout<<"\n\tHash generated :";
+	print(h,8);
+
 	getch();
 }

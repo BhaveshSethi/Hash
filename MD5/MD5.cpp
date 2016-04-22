@@ -127,10 +127,11 @@ void main()
 	ip[N++] = (int32)bitLength;
 	ip[N++] = 0;
 
-
+	/*
 	for(i=0;i<N;i++)
 		cout<<hex<<ip[i]<<" ";
 	//cout<<dec<<N;
+	*/
 
 	for(i=0;i<N/16;i++)
 	{

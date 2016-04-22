@@ -3,6 +3,7 @@ cp ../Snefru_F.cpp		Snefru/Snefru_F.cpp
 cp ../MD4.cpp			MD4.cpp
 cp ../MD5.cpp			MD5/MD5.cpp
 cp ../MD5_File.cpp		MD5/MD5_File.cpp
+cp ../SHA2.cpp			SHA2.cpp
 
 cp ../../INCLUDE/Snefru.h	Snefru/Snefru.h
 git add .

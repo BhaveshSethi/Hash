@@ -149,6 +149,11 @@ void main()
 
 		//cout<<"\n\tHash generated :";
 		print(h,8);
+		fprintf(f,"\n%10s: ",str);
+		for(i=0;i<8;i++)
+			fprintf(f,"%08lx ",h[i]);
 	}
+	fin.close();
+	fclose(f);
 	getch();
 }

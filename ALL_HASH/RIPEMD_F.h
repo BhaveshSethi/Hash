@@ -45,7 +45,6 @@ int s[2][80] = {{ 11, 14, 15, 12, 5, 8, 7, 9, 11, 13, 14, 15, 6, 7, 9, 8,
 
 void printLE(int32 P[], int i)
 {
-	cout<<endl;
 	for(int j=0;j<i;j++)
 		cout<<hex<<setfill('0')<<setw(2)<<(P[j]&0xff)
 					  <<setw(2)<<((P[j]>> 8)&0xff)

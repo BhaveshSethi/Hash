@@ -69,66 +69,45 @@ void print(int32 P[], int i)
 	for(int j=0;j<i;j++)
 		cout<<hex<<setw(8)<<setfill('0')<<P[j]<<" ";
 }
-/*
-void main()
+
+void Snefru(char word[64])
 {
-	clrscr();
-	cout<<"\n\tHashing Technique used Snefru";
-	cout<<"\n\tHash File Test.txt ";
-	int32 ip[16],op[16],bitLength[2] = {0,0}, counter=0;
-	char str[48],ch;
+	int32 bitLength[2] = {0,0},ip[16],op[16];
 	int i;
+	char str[64];
 
-	fstream fin("test.txt",ios::in|ios::binary);
-	FILE *hash = fopen("hash.txt","wt");
+	memset(str,0,64);
+	strcpy(str,word);
+	increment(bitLength,8*strlen(str));
+	memset(ip,0,64);
+	memset(op,0,64);
 
-	while(!fin.eof())
+	for(int counter=0; (counter+48) <= (bitLength[1]/8); counter+=48)
 	{
-
-		for(i=0; i<4; i++)
-			op[i] = 0;
-		fin>>str;
-		bitLength[1] = bitLength[0] = 0;
-		increment(bitLength,8*strlen(str));
-
-		for(i=0;i<4;i++)
-			ip[i] = op[i];
-
-		for(counter=0; (counter+48) <= (bitLength[1]/8); counter+=48)
-		{
-			convert(str,counter,ip);
-			//print(ip,16);
-			hash512(op,ip,8);
-
-			for(i=0;i<4;i++)
-				ip[i] = op[i];
-		}
-
-		if(counter*8 < bitLength[1])
-		{
-			counter += (bitLength[1]/8);
-			while(counter%48!=0)
-				str[counter++] = 0;
-			convert(str,(counter-48),ip);
-			//print(ip,16);
-			hash512(op,ip,8);
-
-			for(i=0;i<4;i++)
-				ip[i] = op[i];
-		}
-		//print(ip,16);
-		ip[14] = bitLength[0];
-		ip[15] = bitLength[1];
+		convert(str,counter,ip);
 		//print(ip,16);
 		hash512(op,ip,8);
 
-		cout<<endl<<setw(10)<<setfill(' ')<<str<<" ";
-		print(op,4);
-
-		fprintf(hash,"%10s ",str);
-		for(int j=0;j<4;j++)
-			fprintf(hash,"%08lx ",op[j]);
-		fprintf(hash,"\n");
+		for(i=0;i<4;i++)
+			ip[i] = op[i];
 	}
-	getch();
-} */
+
+	if(counter*8 < bitLength[1])
+	{
+		counter += (bitLength[1]/8);
+		while(counter%48!=0)
+			str[counter++] = 0;
+		convert(str,(counter-48),ip);
+		//print(ip,16);
+		hash512(op,ip,8);
+
+		for(i=0;i<4;i++)
+			ip[i] = op[i];
+	}
+
+	ip[14] = bitLength[0];
+	ip[15] = bitLength[1];
+	//print(ip,16);
+	hash512(op,ip,8);
+	print(op,4);
+}

@@ -45,7 +45,7 @@ int32 Maj(int32 x, int32 y, int32 z)
 {
 	return ((x&y) ^ (y&z) ^ (z&x));
 }
-/*
+
 void init(int32 w[64])
 {
 	int32 s0,s1;
@@ -57,81 +57,61 @@ void init(int32 w[64])
 	}
 }
 
-
-void main()
+void SHA2(char word[64])
 {
-	clrscr();
 	char str[64];
-	int i,j,byteLength;
-	int32 bitLength[2] = {0,0},w[64];
-	int32 a[8],T1,T0,S0,S1;
+	int32 bitLength[2] = {0,0};
+	int  byteLength,i,j;
+	int32 w[64],a[8],T1,T0,S1,S0,hash[8] = { 0x6a09e667,0xbb67ae85,
+						 0x3c6ef372,0xa54ff53a,
+						 0x510e527f,0x9b05688c,
+						 0x1f83d9ab,0x5be0cd19};
 
-	cout<<"\n\tHashing Technique used SHA-2";
+	memset(str,0,64);
+	strcpy(str,word);
+	increment(bitLength,8*(byteLength = strlen(str)));
+	memset(w,0,256);
 
-	fstream fin("test.txt",ios::in|ios::binary);
-	FILE *f = fopen("hash.txt","wt");
+	//cout<<"\n\tInput String: "<<str<<" of length "<<byteLength;
+	str[byteLength] = (unsigned char)0x80;
 
-	while(!fin.eof())
+	for(i=0;i<56;i+=4)
+		w[i/4] = (((int32)str[i] & 0xffL) << 24) |
+			  (((int32)str[i + 1] & 0xffL) << 16) |
+			  (((int32)str[i + 2] & 0xffL) << 8) |
+			  (((int32)str[i + 3] & 0xffL));
+
+	w[14] = (int32)bitLength[0];
+	w[15] = (int32)bitLength[1];
+
+	init(w);
+
+	//print(w,16);
+
+	for(i=0;i<8;i++)
+		a[i] = hash[i];
+
+	for(i=0;i<64;i++)
 	{
-		memset(str,0,64);
-		bitLength[0] = bitLength[1] = 0;
-		//strcpy(str,"Hash");
-		fin>>str;
-		increment(bitLength,8*(byteLength = strlen(str)));
-		memset(w,0,256);
+		S1 = ROTR(a[4],6) ^ ROTR(a[4],11) ^ ROTR(a[4],25);
+		T1 = S1 + a[7] + Ch(a[4],a[5],a[6]) + k[i] + w[i];
 
-		int32 h[8] = { 0x6a09e667,0xbb67ae85,
-			       0x3c6ef372,0xa54ff53a,
-			       0x510e527f,0x9b05688c,
-			       0x1f83d9ab,0x5be0cd19};
+		S0 = ROTR(a[0],2) ^ ROTR(a[0],13) ^ ROTR(a[0],22);
+		T0 = S0 + Maj(a[0],a[1],a[2]);
 
-		cout<<"\n\t"<<str;//<<" of length "<<byteLength;
-		str[byteLength] = (unsigned char)0x80;
-
-			for(i=0;i<56;i+=4)
-			w[i/4] = (((int32)str[i] & 0xffL) << 24) |
-				  (((int32)str[i + 1] & 0xffL) << 16) |
-				  (((int32)str[i + 2] & 0xffL) << 8) |
-				  (((int32)str[i + 3] & 0xffL));
-
-		w[14] = (int32)bitLength[0];
-		w[15] = (int32)bitLength[1];
-
-		init(w);
-
-		//print(w,16);
-
-		for(i=0;i<8;i++)
-			a[i] = h[i];
-
-		for(i=0;i<64;i++)
+		S0 = a[7];
+		for(j=7;j>0;j--)
 		{
-			S1 = ROTR(a[4],6) ^ ROTR(a[4],11) ^ ROTR(a[4],25);
-			T1 = S1 + a[7] + Ch(a[4],a[5],a[6]) + k[i] + w[i];
-
-			S0 = ROTR(a[0],2) ^ ROTR(a[0],13) ^ ROTR(a[0],22);
-			T0 = S0 + Maj(a[0],a[1],a[2]);
-
-			S0 = a[7];
-			for(j=7;j>0;j--)
-			{
-				a[j] = a[j-1];
-			}
-
-			a[4] += T1;
-			a[0] = T1 + T0;
+			a[j] = a[j-1];
 		}
 
-		for(i=0;i<8;i++)
-			h[i] += a[i];
-
-		//cout<<"\n\tHash generated :";
-		print(h,8);
-		fprintf(f,"\n%10s: ",str);
-		for(i=0;i<8;i++)
-			fprintf(f,"%08lx ",h[i]);
+		a[4] += T1;
+		a[0] = T1 + T0;
 	}
-	fin.close();
-	fclose(f);
-	getch();
-} */
+
+	for(i=0;i<8;i++)
+		hash[i] += a[i];
+
+	//cout<<"\n\tHash generated :";
+	print(hash,8);
+}

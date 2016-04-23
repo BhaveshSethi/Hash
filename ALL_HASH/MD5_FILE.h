@@ -89,164 +89,122 @@ void print(int32 A)
 	cout<<setw(2)<<((A>>16)&0xff);
 	cout<<setw(2)<<((A>>24)&0xff)<<" ";
 }
-FILE *h = fopen("hash.txt","wt");
 void write(int32 A)
 {
+	FILE *h = fopen("hash.txt","wt");
 	fprintf(h,"%02x",((A)&0xff));
 	fprintf(h,"%02x",((A>>8)&0xff));
 	fprintf(h,"%02x",((A>>16)&0xff));
 	fprintf(h,"%02x ",((A>>24)&0xff));
 }
-
-/*void main()
+void MD5(char word[64])
 {
-	clrscr();
-	char str[100];
-	int bitLength,byteLength,i=0,N=0,j,g;
-	int32 ip[50];
-	int32 X[16],AA,BB,CC,DD,temp,dtemp;
-
-	fstream fin("test.txt",ios::in|ios::binary);
-
-	cout<<"\n\tHashing Technique used MD5";
-	cout<<"\n\tHashing File Test.txt\n";
+	char str[64];
+	int byteLength = strlen(word),i,j,N,bitLength;
+	int32 ip[16],X[16],AA,BB,CC,DD,temp,dtemp;
+	int32 A = 0x67452301L,
+	      B = 0xefcdab89L,
+	      C = 0x98badcfeL,
+	      D = 0x10325476L;
 
 
-	while(!fin.eof())
+	memset(str,0,64);
+	strcpy(str,word);
+	memset(ip,0,64);
+	str[byteLength] = (unsigned char)0x80;
+	bitLength = byteLength*8;
+
+	for(i=0;i<byteLength;i+=4)
+		ip[i/4] = (((int32)str[i] & 0xffL)) |
+			  (((int32)str[i + 1] & 0xffL) << 8) |
+			  (((int32)str[i + 2] & 0xffL) << 16) |
+			  (((int32)str[i + 3] & 0xffL) << 24);
+
+	N = 14;
+	ip[N++] = (int32)bitLength;
+	ip[N++] = 0;
+
+	for(i=0;i<N/16;i++)
 	{
+		for(j=0;j<16;j++)
+			X[j] = ip[i*16 + j];
+		//cout<<endl;
+		AA = A;
+		BB = B;
+		CC = C;
+		DD = D;
+		R1(A,B,C,D, 0, 7,X, 0);
+		R1(D,A,B,C, 1,12,X, 1);
+		R1(C,D,A,B, 2,17,X, 2);
+		R1(B,C,D,A, 3,22,X, 3);
+		R1(A,B,C,D, 4, 7,X, 4);
+		R1(D,A,B,C, 5,12,X, 5);
+		R1(C,D,A,B, 6,17,X, 6);
+		R1(B,C,D,A, 7,22,X, 7);
+		R1(A,B,C,D, 8, 7,X, 8);
+		R1(D,A,B,C, 9,12,X, 9);
+		R1(C,D,A,B,10,17,X,10);
+		R1(B,C,D,A,11,22,X,11);
+		R1(A,B,C,D,12, 7,X,12);
+		R1(D,A,B,C,13,12,X,13);
+		R1(C,D,A,B,14,17,X,14);
+		R1(B,C,D,A,15,22,X,15);
 
-		int32 A = 0x67452301L,
-		      B = 0xefcdab89L,
-		      C = 0x98badcfeL,
-		      D = 0x10325476L;
-		i=0;
-		fin>>str;
-		memset(ip,0,200);
-		//gets(str);
-		//strcpy(str,"abc");
-		byteLength = strlen(str);
-		cout<<endl<<setw(10)<<setfill(' ')<<str<<" ";
-		bitLength = 8*byteLength;
+		R2(A,B,C,D, 1, 5,X,16);
+		R2(D,A,B,C, 6, 9,X,17);
+		R2(C,D,A,B,11,14,X,18);
+		R2(B,C,D,A, 0,20,X,19);
+		R2(A,B,C,D, 5, 5,X,20);
+		R2(D,A,B,C,10, 9,X,21);
+		R2(C,D,A,B,15,14,X,22);
+		R2(B,C,D,A, 4,20,X,23);
+		R2(A,B,C,D, 9, 5,X,24);
+		R2(D,A,B,C,14, 9,X,25);
+		R2(C,D,A,B, 3,14,X,26);
+		R2(B,C,D,A, 8,20,X,27);
+		R2(A,B,C,D,13, 5,X,28);
+		R2(D,A,B,C, 2, 9,X,29);
+		R2(C,D,A,B, 7,14,X,30);
+		R2(B,C,D,A,12,20,X,31);
 
-		while(byteLength%64 != 56)
-		{
-			if(!(i++))
-				str[byteLength++] = (unsigned char)(128);
-			else
-				str[byteLength++] = (unsigned char)(0);
-		}
+		R3(A,B,C,D, 5, 4,X,32);
+		R3(D,A,B,C, 8,11,X,33);
+		R3(C,D,A,B,11,16,X,34);
+		R3(B,C,D,A,14,23,X,35);
+		R3(A,B,C,D, 1, 4,X,36);
+		R3(D,A,B,C, 4,11,X,37);
+		R3(C,D,A,B, 7,16,X,38);
+		R3(B,C,D,A,10,23,X,39);
+		R3(A,B,C,D,13, 4,X,40);
+		R3(D,A,B,C, 0,11,X,41);
+		R3(C,D,A,B, 3,16,X,42);
+		R3(B,C,D,A, 6,23,X,43);
+		R3(A,B,C,D, 9, 4,X,44);
+		R3(D,A,B,C,12,11,X,45);
+		R3(C,D,A,B,15,16,X,46);
+		R3(B,C,D,A, 2,23,X,47);
 
-		//cout<<byteLength<<endl;
+		R4(A,B,C,D, 0, 6,X,48);
+		R4(D,A,B,C, 7,10,X,49);
+		R4(C,D,A,B,14,15,X,50);
+		R4(B,C,D,A, 5,21,X,51);
+		R4(A,B,C,D,12, 6,X,52);
+		R4(D,A,B,C, 3,10,X,53);
+		R4(C,D,A,B,10,15,X,54);
+		R4(B,C,D,A, 1,21,X,55);
+		R4(A,B,C,D, 8, 6,X,56);
+		R4(D,A,B,C,15,10,X,57);
+		R4(C,D,A,B, 6,15,X,58);
+		R4(B,C,D,A,13,21,X,59);
+		R4(A,B,C,D, 4, 6,X,60);
+		R4(D,A,B,C,11,10,X,61);
+		R4(C,D,A,B, 2,15,X,62);
+		R4(B,C,D,A, 9,21,X,63);
 
-		for(i=0;i<byteLength;i+=4)
-			ip[i/4] = (((int32)str[i] & 0xffL)) |
-				  (((int32)str[i + 1] & 0xffL) << 8) |
-				  (((int32)str[i + 2] & 0xffL) << 16) |
-				  (((int32)str[i + 3] & 0xffL) << 24);
-
-		N = i/4;
-		ip[N++] = (int32)bitLength;
-		ip[N++] = 0;
-
-		/*
-		for(i=0;i<N;i++)
-			cout<<hex<<ip[i]<<" ";
-		cout<<dec<<N;
-		*/
-
- /*		for(i=0;i<N/16;i++)
-		{
-			for(j=0;j<16;j++)
-				X[j] = ip[i*16 + j];
-
-			AA = A;
-			BB = B;
-			CC = C;
-			DD = D;
-
-			R1(A,B,C,D, 0, 7,X, 0);
-			R1(D,A,B,C, 1,12,X, 1);
-			R1(C,D,A,B, 2,17,X, 2);
-			R1(B,C,D,A, 3,22,X, 3);
-			R1(A,B,C,D, 4, 7,X, 4);
-			R1(D,A,B,C, 5,12,X, 5);
-			R1(C,D,A,B, 6,17,X, 6);
-			R1(B,C,D,A, 7,22,X, 7);
-			R1(A,B,C,D, 8, 7,X, 8);
-			R1(D,A,B,C, 9,12,X, 9);
-			R1(C,D,A,B,10,17,X,10);
-			R1(B,C,D,A,11,22,X,11);
-			R1(A,B,C,D,12, 7,X,12);
-			R1(D,A,B,C,13,12,X,13);
-			R1(C,D,A,B,14,17,X,14);
-			R1(B,C,D,A,15,22,X,15);
-
-			R2(A,B,C,D, 1, 5,X,16);
-			R2(D,A,B,C, 6, 9,X,17);
-			R2(C,D,A,B,11,14,X,18);
-			R2(B,C,D,A, 0,20,X,19);
-			R2(A,B,C,D, 5, 5,X,20);
-			R2(D,A,B,C,10, 9,X,21);
-			R2(C,D,A,B,15,14,X,22);
-			R2(B,C,D,A, 4,20,X,23);
-			R2(A,B,C,D, 9, 5,X,24);
-			R2(D,A,B,C,14, 9,X,25);
-			R2(C,D,A,B, 3,14,X,26);
-			R2(B,C,D,A, 8,20,X,27);
-			R2(A,B,C,D,13, 5,X,28);
-			R2(D,A,B,C, 2, 9,X,29);
-			R2(C,D,A,B, 7,14,X,30);
-			R2(B,C,D,A,12,20,X,31);
-
-			R3(A,B,C,D, 5, 4,X,32);
-			R3(D,A,B,C, 8,11,X,33);
-			R3(C,D,A,B,11,16,X,34);
-			R3(B,C,D,A,14,23,X,35);
-			R3(A,B,C,D, 1, 4,X,36);
-			R3(D,A,B,C, 4,11,X,37);
-			R3(C,D,A,B, 7,16,X,38);
-			R3(B,C,D,A,10,23,X,39);
-			R3(A,B,C,D,13, 4,X,40);
-			R3(D,A,B,C, 0,11,X,41);
-			R3(C,D,A,B, 3,16,X,42);
-			R3(B,C,D,A, 6,23,X,43);
-			R3(A,B,C,D, 9, 4,X,44);
-			R3(D,A,B,C,12,11,X,45);
-			R3(C,D,A,B,15,16,X,46);
-			R3(B,C,D,A, 2,23,X,47);
-
-			R4(A,B,C,D, 0, 6,X,48);
-			R4(D,A,B,C, 7,10,X,49);
-			R4(C,D,A,B,14,15,X,50);
-			R4(B,C,D,A, 5,21,X,51);
-			R4(A,B,C,D,12, 6,X,52);
-			R4(D,A,B,C, 3,10,X,53);
-			R4(C,D,A,B,10,15,X,54);
-			R4(B,C,D,A, 1,21,X,55);
-			R4(A,B,C,D, 8, 6,X,56);
-			R4(D,A,B,C,15,10,X,57);
-			R4(C,D,A,B, 6,15,X,58);
-			R4(B,C,D,A,13,21,X,59);
-			R4(A,B,C,D, 4, 6,X,60);
-			R4(D,A,B,C,11,10,X,61);
-			R4(C,D,A,B, 2,15,X,62);
-			R4(B,C,D,A, 9,21,X,63);
-
-			A = A + AA;
-			B = B + BB;
-			C = C + CC;
-			D = D + DD;
-
-		}
-		printHash(A,B,C,D);
-		writeHash(A,B,C,D);
+		A = A + AA;
+		B = B + BB;
+		C = C + CC;
+		D = D + DD;
 	}
-	fin.close();
-	fclose(h);
-	/*
-	cout<<"\n\tHash generated: ";
 	printHash(A,B,C,D);
-	*/
-  /*
-	getch();
-}   */
+}

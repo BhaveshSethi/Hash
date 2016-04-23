@@ -9,6 +9,13 @@ cp ../RIPE_MD.cpp		RIPE-MD/RIPE_MD.cpp
 cp ../RIPEMD_F.cpp		RIPE-MD/RIPEMD_F.cpp
 
 cp ../../INCLUDE/Snefru.h	Snefru/Snefru.h
+
+cp ../ALL_HASH.cpp		ALL_HASH/ALL_HASH.cpp
+cp ../../INCLUDE/SNEFRU_F.h	ALL_HASH/SNEFRU_F.h
+cp ../../INCLUDE/MD5_FILE.h	ALL_HASH/MD5_FILE.h
+cp ../../INCLUDE/SHA2_F.h	ALL_HASH/SHA2_F.h
+cp ../../INCLUDE/RIPEMD_F.h	ALL_HASH/RIPEMD_F.h
+
 git add .
 git commit -m "$1"
 git push -u origin master

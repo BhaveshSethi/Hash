@@ -70,7 +70,7 @@ void print(int32 P[], int i)
 		cout<<hex<<setw(8)<<setfill('0')<<P[j]<<" ";
 }
 
-void Snefru(char word[64])
+void Snefru(char word[64], int32 res[])
 {
 	int32 bitLength[2] = {0,0},ip[16],op[16];
 	int i;
@@ -110,4 +110,6 @@ void Snefru(char word[64])
 	//print(ip,16);
 	hash512(op,ip,8);
 	print(op,4);
+	for(i=0;i<4;i++)
+		res[i] = op[i];
 }

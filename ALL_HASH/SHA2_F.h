@@ -57,7 +57,7 @@ void init(int32 w[64])
 	}
 }
 
-void SHA2(char word[64])
+void SHA2(char word[64], int32 res[16])
 {
 	char str[64];
 	int32 bitLength[2] = {0,0};
@@ -114,4 +114,6 @@ void SHA2(char word[64])
 
 	//cout<<"\n\tHash generated :";
 	print(hash,8);
+	for(i=0;i<8;i++)
+		res[i] = hash[i];
 }

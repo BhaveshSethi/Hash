@@ -97,7 +97,7 @@ void write(int32 A)
 	fprintf(h,"%02x",((A>>16)&0xff));
 	fprintf(h,"%02x ",((A>>24)&0xff));
 }
-void MD5(char word[64])
+void MD5(char word[64], int32 res[])
 {
 	char str[64];
 	int byteLength = strlen(word),i,j,N,bitLength;
@@ -114,7 +114,7 @@ void MD5(char word[64])
 	str[byteLength] = (unsigned char)0x80;
 	bitLength = byteLength*8;
 
-	for(i=0;i<byteLength;i+=4)
+	for(i=0;i<56;i+=4)
 		ip[i/4] = (((int32)str[i] & 0xffL)) |
 			  (((int32)str[i + 1] & 0xffL) << 8) |
 			  (((int32)str[i + 2] & 0xffL) << 16) |
@@ -207,4 +207,8 @@ void MD5(char word[64])
 		D = D + DD;
 	}
 	printHash(A,B,C,D);
+	res[0] = A;
+	res[1] = B;
+	res[2] = C;
+	res[3] = D;
 }

@@ -61,7 +61,7 @@ void write(FILE *h, int32 A)
 	fprintf(h,"%02x ",((A>>24)&0xff));
 }
 
-void RIPE_MD(char word[64])
+void RIPE_MD(char word[64], int32 res[])
 {
 	char str[64];
 	int32 X[16], bitLength[2],A[2][5],T;
@@ -118,5 +118,6 @@ void RIPE_MD(char word[64])
 	hash[0] = T;
 
 	printLE(hash,5);
-
+	for(i=0;i<5;i++)
+		res[i] = hash[i];
 }

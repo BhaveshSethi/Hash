@@ -122,7 +122,7 @@ void main()
 		for(i=0;i<4;i++)
 			ip[i] = op[i];
 	}
-	//print(ip,16);
+
 	ip[14] = bitLength[0];
 	ip[15] = bitLength[1];
 	//print(ip,16);
@@ -135,19 +135,5 @@ void main()
 		cout<<hex<<op[i]<<" ";
 	*/
 
-
-	/*
-	memset(ip,0,64);
-	do
-	{
-		size = scanf;
-		cout<<endl<<str<<endl;
-	}while(size>0);
-	hash512(op,ip,8);
-	for(i=0;i<4;i++)
-		cout<<hex<<(unsigned long int)op[i]<<" ";
-	hash512(ip,op,8);
-	cout<<"\n";
-	*/
 	getch();
 }

@@ -1,4 +1,15 @@
-//ALL HASH
+/*****************************************************************
+This program is developed by Bhavesh Sethi.
+It is used to calculate HASH VALUES using algorithms:
+	1. MD5
+	2. Snefru
+	3. SHA2
+	4. RIPE-MD
+These algorithms are freely available on internet.
+
+This program is only for demonstration purposes.
+A test file "test.txt" is used to show the working of Algorithms.
+*******************************************************************/
 #include<fstream.h>
 #include<conio.h>
 #include<stdio.h>
@@ -15,8 +26,7 @@ void writeFile(char ch)
 {
 
 	fstream fin("test.txt",ios::in|ios::binary);
-	FILE *hFile = fopen("all-hash.txt","wt");
-	fprintf(hFile,"ALL HASH: Hashing Technique used: ");
+	FILE *hFile;
 	char str[64];
 	int32 res[16];
 	int i;
@@ -24,16 +34,16 @@ void writeFile(char ch)
 	switch(ch)
 	{
 		case '1':
-			fprintf(hFile,"MD5");
+			hFile = fopen("hashMD5.txt","wt");
 		break;
 		case '2':
-			fprintf(hFile,"SHA2");
+			hFile = fopen("hashSHA2.txt","wt");
 		break;
 		case '3':
-			fprintf(hFile,"Snefru");
+			hFile = fopen("hashSNEF.txt","wt");
 		break;
 		case '4':
-			fprintf(hFile,"RIPE_MD");
+			hFile = fopen("hashRIPE.txt","wt");
 		break;
 	}
 	while(!fin.eof())
@@ -82,7 +92,7 @@ void writeFile(char ch)
 }
 
 void main()
-	{
+{
 	clrscr();
 
 	char ch,str[64];
@@ -94,18 +104,54 @@ void main()
 	do
 	{
 		cout<<"\n\n\t>>>Select<<<\n\t1. MD5\n\t2. SHA2\n\t3. SNEFRU"
-		<<"\n\t4. RIPE_MD\n\t5. ALL_HASH for a word\n\t6. Exit ";
+		<<"\n\t4. RIPE_MD\n\t5. ALL_HASH for a word\n\t6. Exit "
+		<<"\n\tPress 1-6 to select ";
 		ch = getch();
 
 		if(ch == '5')
 		{
+			FILE *hFile1 = fopen("hash_MD5.txt","at");
+			FILE *hFile2 = fopen("hash_SHA.txt","at");
+			FILE *hFile3 = fopen("hash_SNE.txt","at");
+			FILE *hFile4 = fopen("hash_RMD.txt","at");
+
 			memset(str,0,64);
 			cout<<"\n\n\tEnter Word ";
 			cin>>str;
 			cout<<"\n\tMD5 Hash: \n\t";MD5(str,res);
+			fprintf(hFile1,"\n%10s: ",str);
+			for(i=0;i<4;i++)
+			{
+				fprintf(hFile1,"%02x",((res[i])&0xff));
+				fprintf(hFile1,"%02x",((res[i]>>8)&0xff));
+				fprintf(hFile1,"%02x",((res[i]>>16)&0xff));
+				fprintf(hFile1,"%02x ",((res[i]>>24)&0xff));
+			}
+
 			cout<<"\n\tSHA2 Hash: \n";SHA2(str,res);
+			fprintf(hFile2,"\n%10s: ",str);
+			for(i=0;i<8;i++)
+				fprintf(hFile2,"%08lx ",res[i]);
+
 			cout<<"\n\tSnefru Hash: \n\t";Snefru(str,res);
+			fprintf(hFile3,"\n%10s: ",str);
+			for(i=0;i<4;i++)
+				fprintf(hFile3,"%08lx ",res[i]);
+
 			cout<<"\n\tRIPE_MD Hash: \n\t";RIPE_MD(str,res);
+			fprintf(hFile4,"\n%10s: ",str);
+			for(i=0;i<5;i++)
+			{
+				fprintf(hFile4,"%02x",((res[i])&0xff));
+				fprintf(hFile4,"%02x",((res[i]>>8)&0xff));
+				fprintf(hFile4,"%02x",((res[i]>>16)&0xff));
+				fprintf(hFile4,"%02x ",((res[i]>>24)&0xff));
+			}
+
+			fclose(hFile1);
+			fclose(hFile2);
+			fclose(hFile3);
+			fclose(hFile4);
 			continue;
 		}
 
